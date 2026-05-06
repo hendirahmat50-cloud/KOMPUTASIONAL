@@ -1,0 +1,459 @@
+import React, { useState, useEffect } from 'react';
+import { Brain, Grid, Lightbulb, ListOrdered, Play, CheckCircle, XCircle, RefreshCw, BookOpen, Gamepad2, PenTool, ArrowRight, ArrowDown, ArrowUp, ArrowLeft } from 'lucide-react';
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState('materi');
+
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
+      {/* Header */}
+      <header className="bg-indigo-600 text-white shadow-md">
+        <div className="max-w-4xl mx-auto px-4 py-6 text-center">
+          <div className="flex justify-center mb-3">
+            <Brain size={48} className="text-indigo-200" />
+          </div>
+          <h1 className="text-3xl font-bold mb-2">Pemikiran Komputasional</h1>
+          <p className="text-indigo-100">Belajar menyelesaikan masalah seperti seorang saintis komputer</p>
+        </div>
+      </header>
+
+      {/* Navigasi */}
+      <nav className="bg-white shadow-sm sticky top-0 z-10">
+        <div className="max-w-4xl mx-auto px-4 flex justify-center space-x-2 py-2">
+          <TabButton 
+            active={activeTab === 'materi'} 
+            onClick={() => setActiveTab('materi')} 
+            icon={<BookOpen size={18} />} 
+            label="Materi" 
+          />
+          <TabButton 
+            active={activeTab === 'simulasi'} 
+            onClick={() => setActiveTab('simulasi')} 
+            icon={<Gamepad2 size={18} />} 
+            label="Simulasi" 
+          />
+          <TabButton 
+            active={activeTab === 'kuiz'} 
+            onClick={() => setActiveTab('kuiz')} 
+            icon={<PenTool size={18} />} 
+            label="Kuiz" 
+          />
+        </div>
+      </nav>
+
+      {/* Kandungan Utama */}
+      <main className="max-w-4xl mx-auto px-4 py-8">
+        {activeTab === 'materi' && <MateriSection />}
+        {activeTab === 'simulasi' && <SimulasiSection />}
+        {activeTab === 'kuiz' && <KuizSection />}
+      </main>
+    </div>
+  );
+}
+
+// --- Komponen Butang Navigasi ---
+function TabButton({ active, onClick, icon, label }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center px-4 py-2 rounded-full font-medium transition-colors duration-200 ${
+        active 
+          ? 'bg-indigo-600 text-white shadow-md' 
+          : 'bg-slate-100 text-slate-600 hover:bg-indigo-100 hover:text-indigo-700'
+      }`}
+    >
+      <span className="mr-2">{icon}</span>
+      {label}
+    </button>
+  );
+}
+
+// --- Bahagian Materi ---
+function MateriSection() {
+  const pillars = [
+    {
+      title: 'Leraian (Decomposition)',
+      icon: <Grid size={32} className="text-blue-500" />,
+      desc: 'Memecahkan masalah atau sistem yang kompleks kepada bahagian-bahagian yang lebih kecil dan mudah diuruskan.',
+      example: 'Contoh: Membina basikal dengan melihat bahagian roda, rantai, dan rangka secara berasingan.'
+    },
+    {
+      title: 'Pengecaman Corak (Pattern Recognition)',
+      icon: <RefreshCw size={32} className="text-emerald-500" />,
+      desc: 'Mencari persamaan, corak, atau trend dalam masalah. Ini membantu menyelesaikan masalah dengan lebih cepat.',
+      example: 'Contoh: Menyedari bahawa semua kereta memerlukan enjin, tayar, dan stereng untuk berfungsi.'
+    },
+    {
+      title: 'Peniskalaan (Abstraction)',
+      icon: <Lightbulb size={32} className="text-amber-500" />,
+      desc: 'Memberi tumpuan kepada maklumat yang penting sahaja dan mengabaikan butiran yang tidak relevan.',
+      example: 'Contoh: Peta transit LRT hanya menunjukkan stesen dan laluan, mengabaikan jalan raya dan bangunan sebenar.'
+    },
+    {
+      title: 'Algoritma (Algorithm)',
+      icon: <ListOrdered size={32} className="text-purple-500" />,
+      desc: 'Membangunkan arahan langkah demi langkah untuk menyelesaikan masalah atau mencapai matlamat.',
+      example: 'Contoh: Resepi memasak nasi lemak atau manual memasang perabot.'
+    }
+  ];
+
+  return (
+    <div className="space-y-6 transform animate-fade-in">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-slate-800">4 Tonggak Utama</h2>
+        <p className="text-slate-600 mt-2">Pemikiran komputasional dibina di atas empat asas kemahiran ini.</p>
+      </div>
+      
+      <div className="grid md:grid-cols-2 gap-6">
+        {pillars.map((pillar, idx) => (
+          <div key={idx} className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+            <div className="flex items-center mb-4">
+              <div className="p-3 bg-slate-50 rounded-lg mr-4">
+                {pillar.icon}
+              </div>
+              <h3 className="text-xl font-bold text-slate-700">{pillar.title}</h3>
+            </div>
+            <p className="text-slate-600 mb-4">{pillar.desc}</p>
+            <div className="bg-slate-50 p-3 rounded border-l-4 border-indigo-400 text-sm text-slate-700 font-medium">
+              {pillar.example}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// --- Bahagian Simulasi (Membina Algoritma) ---
+function SimulasiSection() {
+  const GRID_SIZE = 5;
+  const START_POS = { x: 0, y: 0 };
+  const TARGET_POS = { x: 4, y: 4 };
+  const OBSTACLES = [{x: 1, y: 1}, {x: 2, y: 1}, {x: 1, y: 3}, {x: 3, y: 3}, {x: 3, y: 4}];
+
+  const [robotPos, setRobotPos] = useState(START_POS);
+  const [commands, setCommands] = useState([]);
+  const [isRunning, setIsRunning] = useState(false);
+  const [status, setStatus] = useState('idle'); // idle, success, crash
+
+  // Menambah arahan
+  const addCommand = (cmd) => {
+    if (isRunning) return;
+    setCommands([...commands, cmd]);
+  };
+
+  // Memadam arahan terakhir
+  const undoCommand = () => {
+    if (isRunning) return;
+    setCommands(commands.slice(0, -1));
+  };
+
+  // Menetapkan semula simulasi
+  const resetSimulation = () => {
+    setRobotPos(START_POS);
+    setCommands([]);
+    setStatus('idle');
+    setIsRunning(false);
+  };
+
+  // Semak halangan
+  const isObstacle = (x, y) => {
+    return OBSTACLES.some(obs => obs.x === x && obs.y === y);
+  };
+
+  // Menjalankan algoritma
+  const runAlgorithm = async () => {
+    if (commands.length === 0 || isRunning) return;
+    
+    setIsRunning(true);
+    setStatus('idle');
+    setRobotPos(START_POS);
+    
+    let currentX = START_POS.x;
+    let currentY = START_POS.y;
+
+    for (let i = 0; i < commands.length; i++) {
+      await new Promise(r => setTimeout(r, 500)); // Lengah setengah saat
+      
+      const cmd = commands[i];
+      let nextX = currentX;
+      let nextY = currentY;
+
+      if (cmd === 'UP') nextY -= 1;
+      if (cmd === 'DOWN') nextY += 1;
+      if (cmd === 'LEFT') nextX -= 1;
+      if (cmd === 'RIGHT') nextX += 1;
+
+      // Semak sempadan dan halangan
+      if (nextX < 0 || nextX >= GRID_SIZE || nextY < 0 || nextY >= GRID_SIZE || isObstacle(nextX, nextY)) {
+        setStatus('crash');
+        setIsRunning(false);
+        return;
+      }
+
+      currentX = nextX;
+      currentY = nextY;
+      setRobotPos({ x: currentX, y: currentY });
+
+      // Semak kemenangan
+      if (currentX === TARGET_POS.x && currentY === TARGET_POS.y) {
+        setStatus('success');
+        setIsRunning(false);
+        return;
+      }
+    }
+    
+    setIsRunning(false);
+    if (currentX !== TARGET_POS.x || currentY !== TARGET_POS.y) {
+      setStatus('crash'); // Tidak sampai ke destinasi
+    }
+  };
+
+  return (
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+      <div className="text-center mb-6">
+        <h2 className="text-2xl font-bold text-slate-800">Simulasi Algoritma</h2>
+        <p className="text-slate-600 mt-2">Bina urutan arahan (algoritma) untuk membawa 🤖 ke bendera 🏁 tanpa melanggar kotak merah.</p>
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-8 items-start justify-center">
+        {/* Papan Grid */}
+        <div className="bg-slate-200 p-2 rounded-lg shadow-inner shrink-0">
+          <div 
+            className="grid gap-1" 
+            style={{ 
+              gridTemplateColumns: `repeat(${GRID_SIZE}, minmax(0, 1fr))`,
+              width: '280px', height: '280px' 
+            }}
+          >
+            {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, idx) => {
+              const x = idx % GRID_SIZE;
+              const y = Math.floor(idx / GRID_SIZE);
+              
+              const isRobot = robotPos.x === x && robotPos.y === y;
+              const isTarget = TARGET_POS.x === x && TARGET_POS.y === y;
+              const isObs = isObstacle(x, y);
+
+              let cellClass = "bg-white rounded flex items-center justify-center text-2xl w-full h-full";
+              if (isObs) cellClass = "bg-red-400 rounded flex items-center justify-center text-white";
+              else if (isTarget && !isRobot) cellClass += " bg-green-100";
+
+              return (
+                <div key={idx} className={cellClass}>
+                  {isRobot ? '🤖' : isTarget ? '🏁' : isObs ? '🧱' : ''}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Panel Kawalan */}
+        <div className="flex-1 w-full max-w-sm">
+          <div className="mb-4">
+            <h3 className="font-bold text-slate-700 mb-2">Panel Arahan:</h3>
+            <div className="grid grid-cols-3 gap-2 w-48 mx-auto md:mx-0">
+              <div />
+              <button disabled={isRunning} onClick={() => addCommand('UP')} className="btn-control"><ArrowUp size={20}/></button>
+              <div />
+              <button disabled={isRunning} onClick={() => addCommand('LEFT')} className="btn-control"><ArrowLeft size={20}/></button>
+              <button disabled={isRunning} onClick={() => addCommand('DOWN')} className="btn-control"><ArrowDown size={20}/></button>
+              <button disabled={isRunning} onClick={() => addCommand('RIGHT')} className="btn-control"><ArrowRight size={20}/></button>
+            </div>
+          </div>
+
+          <div className="bg-slate-50 border border-slate-200 rounded p-4 h-32 overflow-y-auto mb-4 flex flex-wrap gap-2 content-start">
+            {commands.length === 0 && <span className="text-slate-400 text-sm">Tiada arahan lagi. Klik butang panah di atas.</span>}
+            {commands.map((cmd, idx) => (
+              <span key={idx} className="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded font-mono border border-indigo-200 flex items-center">
+                {cmd === 'UP' && <ArrowUp size={14}/>}
+                {cmd === 'DOWN' && <ArrowDown size={14}/>}
+                {cmd === 'LEFT' && <ArrowLeft size={14}/>}
+                {cmd === 'RIGHT' && <ArrowRight size={14}/>}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex gap-2">
+            <button 
+              onClick={runAlgorithm} 
+              disabled={isRunning || commands.length === 0}
+              className="flex-1 bg-green-500 hover:bg-green-600 disabled:bg-slate-300 text-white py-2 rounded font-bold flex justify-center items-center transition"
+            >
+              <Play size={18} className="mr-1"/> Jalankan
+            </button>
+            <button 
+              onClick={undoCommand} 
+              disabled={isRunning || commands.length === 0}
+              className="bg-amber-500 hover:bg-amber-600 disabled:bg-slate-300 text-white px-4 py-2 rounded font-bold transition"
+            >
+              Undur
+            </button>
+            <button 
+              onClick={resetSimulation} 
+              disabled={isRunning}
+              className="bg-slate-500 hover:bg-slate-600 disabled:bg-slate-300 text-white px-4 py-2 rounded font-bold transition"
+            >
+              Reset
+            </button>
+          </div>
+
+          {/* Status Messages */}
+          {status === 'success' && (
+            <div className="mt-4 p-3 bg-green-100 text-green-800 rounded border border-green-300 flex items-center">
+              <CheckCircle className="mr-2" /> Tahniah! Algoritma anda berjaya.
+            </div>
+          )}
+          {status === 'crash' && (
+            <div className="mt-4 p-3 bg-red-100 text-red-800 rounded border border-red-300 flex items-center">
+              <XCircle className="mr-2" /> Gagal. Robot terlanggar halangan atau tidak sampai.
+            </div>
+          )}
+        </div>
+      </div>
+      <style dangerouslySetInnerHTML={{__html: `
+        .btn-control {
+          background-color: #e2e8f0;
+          color: #475569;
+          padding: 0.5rem;
+          border-radius: 0.5rem;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          transition: all 0.2s;
+        }
+        .btn-control:hover:not(:disabled) {
+          background-color: #cbd5e1;
+        }
+        .btn-control:active:not(:disabled) {
+          background-color: #94a3b8;
+          transform: scale(0.95);
+        }
+      `}} />
+    </div>
+  );
+}
+
+// --- Bahagian Kuiz ---
+function KuizSection() {
+  const questions = [
+    {
+      q: "Proses mengabaikan butiran yang tidak penting dan memfokuskan kepada maklumat utama dipanggil...",
+      options: ["Leraian (Decomposition)", "Peniskalaan (Abstraction)", "Algoritma", "Pengecaman Corak"],
+      answer: 1
+    },
+    {
+      q: "Apabila kita memecahkan proses membakar kek kepada langkah-langkah seperti menyediakan bahan, mengadun, dan membakar, kita sedang menggunakan teknik...",
+      options: ["Pengecaman Corak", "Algoritma", "Leraian (Decomposition)", "Pengekodan"],
+      answer: 2
+    },
+    {
+      q: "Satu set arahan langkah demi langkah untuk menyelesaikan sesuatu tugasan dipanggil sebagai...",
+      options: ["Algoritma", "Peniskalaan", "Pembolehubah", "Logik"],
+      answer: 0
+    }
+  ];
+
+  const [currentQ, setCurrentQ] = useState(0);
+  const [score, setScore] = useState(0);
+  const [showResult, setShowResult] = useState(false);
+  const [selectedOpt, setSelectedOpt] = useState(null);
+
+  const handleAnswer = (idx) => {
+    setSelectedOpt(idx);
+    
+    // Tunggu sebentar sebelum bergerak ke soalan seterusnya
+    setTimeout(() => {
+      if (idx === questions[currentQ].answer) {
+        setScore(score + 1);
+      }
+      
+      if (currentQ < questions.length - 1) {
+        setCurrentQ(currentQ + 1);
+        setSelectedOpt(null);
+      } else {
+        setShowResult(true);
+      }
+    }, 1000);
+  };
+
+  const restartQuiz = () => {
+    setCurrentQ(0);
+    setScore(0);
+    setShowResult(false);
+    setSelectedOpt(null);
+  };
+
+  if (showResult) {
+    const percentage = Math.round((score / questions.length) * 100);
+    let message = "";
+    if (percentage === 100) message = "Luar Biasa! Pemahaman yang sempurna.";
+    else if (percentage >= 50) message = "Bagus! Anda sudah memahami asasnya.";
+    else message = "Jangan berputus asa, mari ulang kaji semula di bahagian Materi.";
+
+    return (
+      <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 text-center max-w-lg mx-auto">
+        <div className="mb-6">
+          {percentage >= 50 ? <CheckCircle size={64} className="mx-auto text-green-500" /> : <RefreshCw size={64} className="mx-auto text-amber-500" />}
+        </div>
+        <h2 className="text-3xl font-bold text-slate-800 mb-2">Markah Anda: {percentage}%</h2>
+        <p className="text-slate-600 mb-6">{score} daripada {questions.length} soalan betul.</p>
+        <p className="text-lg font-medium text-indigo-700 mb-8">{message}</p>
+        <button 
+          onClick={restartQuiz}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition w-full"
+        >
+          Cuba Lagi
+        </button>
+      </div>
+    );
+  }
+
+  const q = questions[currentQ];
+
+  return (
+    <div className="bg-white p-8 rounded-xl shadow-sm border border-slate-100 max-w-2xl mx-auto">
+      <div className="mb-8 flex justify-between items-center text-sm font-medium text-slate-500">
+        <span>Soalan {currentQ + 1} daripada {questions.length}</span>
+        <div className="flex gap-1">
+          {questions.map((_, i) => (
+            <div key={i} className={`w-8 h-2 rounded-full ${i <= currentQ ? 'bg-indigo-500' : 'bg-slate-200'}`} />
+          ))}
+        </div>
+      </div>
+      
+      <h2 className="text-xl font-bold text-slate-800 mb-6 leading-relaxed">
+        {q.q}
+      </h2>
+      
+      <div className="space-y-3">
+        {q.options.map((opt, idx) => {
+          let btnClass = "w-full text-left p-4 rounded-lg border-2 transition-all duration-200 font-medium ";
+          
+          if (selectedOpt === null) {
+            btnClass += "border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 text-slate-700";
+          } else {
+            // Logik paparan betul/salah selepas pengguna klik
+            if (idx === q.answer) {
+              btnClass += "border-green-500 bg-green-50 text-green-800"; // Jawapan yang betul (hijau)
+            } else if (idx === selectedOpt) {
+              btnClass += "border-red-500 bg-red-50 text-red-800"; // Pilihan salah pengguna (merah)
+            } else {
+              btnClass += "border-slate-200 opacity-50"; // Lain-lain
+            }
+          }
+
+          return (
+            <button
+              key={idx}
+              disabled={selectedOpt !== null}
+              onClick={() => handleAnswer(idx)}
+              className={btnClass}
+            >
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
